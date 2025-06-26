@@ -1,33 +1,26 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+### mongodb connect
 
-## Getting Started
+andersonmingz/XktFbSOxiRXXRLK8
 
-First, run the development server:
+## context 文件夹
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+用于存放 React Context 文件、管理全局状态（如用户认证、主题切换等）
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `user.ts`：定义用户上下文，包括用户信息和登录状态。
+- `context.tsx`：定义全局上下文，包括用户信息和主题设置。
+- `theme.ts`：定义主题颜色和字体样式。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## components 文件夹
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `Header.tsx`：定义页眉组件，包括导航栏和搜索框。
+- `Footer.tsx`：定义页脚组件，包括版权信息和社交链接。
+- `Card.tsx`：定义卡片组件，用于显示文章摘要。
+- `Post.tsx`：定义文章组件，用于显示文章内容。
+- `PostList.tsx`：定义文章列表组件，用于显示多篇文章摘要。
 
-## Learn More
+## config 文件夹
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+用于存放配置文件，如 API 端点、环境变量、应用变量等。
 
 ## Deploy on Vercel
 
