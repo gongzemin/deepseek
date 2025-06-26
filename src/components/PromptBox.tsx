@@ -2,7 +2,13 @@ import React, { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { assets } from '@/assets/assets'
 
-const PromptBox = ({ setIsLoading, isLoading }) => {
+// 定义组件 props 类型
+interface PromptBoxProps {
+  setIsLoading: (isLoading: boolean) => void
+  isLoading: boolean
+}
+const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
+  console.log('PromptBox rendered', isLoading, setIsLoading)
   const [prompt, setPrompt] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 

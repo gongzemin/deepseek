@@ -9,7 +9,7 @@ export default function Home() {
   // 定义一个状态变量expand，初始值为false
   const [expand, setExpand] = useState(false)
   // 定义一个状态变量messages，初始值为空数组
-  const [messages, setMessages] = useState([])
+  const [messages] = useState([]) // messages
   // 定义一个状态变量isLoading，初始值为false
   const [isLoading, setIsLoading] = useState(false)
   return (

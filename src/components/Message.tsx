@@ -2,7 +2,13 @@ import React from 'react'
 import Image from 'next/image'
 import { assets } from '@/assets/assets'
 
-const Message = ({ role, content }) => {
+// 定义Message组件的props类型
+type MessageProps = {
+  role: 'user' | 'assistant' // 限定role为这两种值
+  content: React.ReactNode // 允许任何React可渲染内容
+}
+
+const Message = ({ role, content }: MessageProps) => {
   return (
     <div className="flex flex-col items-center w-full max-w-3xl text-sm">
       <div

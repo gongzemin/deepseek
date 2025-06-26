@@ -2,7 +2,23 @@ import React from 'react'
 import { assets } from '@/assets/assets'
 import Image from 'next/image'
 
-const ChatLabel = ({ openMenu, setOpenMenu }) => {
+// 使用接口定义props
+
+// 定义 openMenu 的状态类型
+type OpenMenuState = {
+  id: number
+  open: boolean
+}
+
+// 定义组件 Props 类型
+interface ChatLabelProps {
+  openMenu: OpenMenuState
+  setOpenMenu?: (newState: OpenMenuState) => void // 接收完整状态对象
+}
+
+const ChatLabel: React.FC<ChatLabelProps> = ({ openMenu, setOpenMenu }) => {
+  //
+  console.log('set', setOpenMenu)
   return (
     <div
       className="flex items-center justify-between p-2 text-white/80
