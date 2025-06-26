@@ -137,7 +137,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
         </div>
 
         <div
-          onClick={user ? undefined : () => openSignIn}
+          onClick={user ? undefined : () => openSignIn()}
           className={`flex items-center ${
             expand ? 'hover:bg-white/10 rounded-lg' : 'justify-center w-full'
           } gap-3
