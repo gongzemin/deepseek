@@ -11,7 +11,7 @@ interface SidebarProps {
 }
 const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
   const { openSignIn } = useClerk()
-  const { user } = useAppContext()
+  const { user, chats, createNewChat } = useAppContext()
   const [openMenu, setOpenMenu] = useState({ id: 0, open: false })
 
   return (
@@ -67,6 +67,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
         </div>
 
         <button
+          onClick={createNewChat}
           className={`mt-8 flex items-center justify-center cursor-pointer
          ${
            expand
@@ -95,7 +96,15 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
           }`}
         >
           <p className="my-1">最近</p>
-          <ChatLabel openMenu={openMenu} setOpenMenu={setOpenMenu} />
+          {chats.map(chat => (
+            <ChatLabel
+              name={chat.name ?? '未命名聊天'}
+              key={chat._id}
+              id={chat._id}
+              openMenu={openMenu}
+              setOpenMenu={setOpenMenu}
+            />
+          ))}
         </div>
       </div>
 

@@ -1,14 +1,26 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Image from 'next/image'
 import { assets } from '@/assets/assets'
+import Markdown from 'react-markdown'
+import Prism from 'prismjs'
+import toast from 'react-hot-toast'
 
 // 定义Message组件的props类型
 type MessageProps = {
   role: 'user' | 'assistant' // 限定role为这两种值
-  content: React.ReactNode // 允许任何React可渲染内容
+  content: string // 允许任何React可渲染内容
 }
 
 const Message = ({ role, content }: MessageProps) => {
+  useEffect(() => {
+    Prism.highlightAll()
+  }, [content])
+
+  const copyMessage = () => {
+    navigator.clipboard.writeText(content as string)
+    toast.success('消息已复制到剪贴板')
+  }
+
   return (
     <div className="flex flex-col items-center w-full max-w-3xl text-sm">
       <div
@@ -29,6 +41,7 @@ const Message = ({ role, content }: MessageProps) => {
               {role === 'user' ? (
                 <>
                   <Image
+                    onClick={copyMessage}
                     src={assets.copy_icon}
                     alt=""
                     className="w-4 cursor-pointer"
@@ -42,6 +55,7 @@ const Message = ({ role, content }: MessageProps) => {
               ) : (
                 <>
                   <Image
+                    onClick={copyMessage}
                     src={assets.copy_icon}
                     alt=""
                     className="w-4.5 cursor-pointer"
@@ -75,7 +89,9 @@ const Message = ({ role, content }: MessageProps) => {
                 alt=""
                 className="h-9 w-9 p-1 border-white/15 rounded-full"
               />
-              <div className="space-y-4 w-full overflow-scroll">{content}</div>
+              <div className="space-y-4 w-full overflow-scroll">
+                <Markdown>{content}</Markdown>
+              </div>
             </>
           )}
         </div>
