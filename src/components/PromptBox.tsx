@@ -28,8 +28,7 @@ const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
   selectedChat: The currently selected chat.
   setSelectedChat: Updates the selected chat.
   */
-  const { user, chats, setChats, selectedChat, setSelectedChat } =
-    useAppContext() // 全局状态
+  const { user, setChats, selectedChat, setSelectedChat } = useAppContext() // 全局状态
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     // 如果按下的是回车键且没有按住 Shift 键，则发送消息
