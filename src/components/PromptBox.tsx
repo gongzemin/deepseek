@@ -92,15 +92,47 @@ const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
       })
       if (data.success) {
         // 1. 先将AI回复完整添加到全局聊天列表
+        // setChats(prevChats =>
+        //   prevChats.map(chat =>
+        //     chat._id === selectedChat?._id
+        //       ? {
+        //           ...chat,
+        //           messages: [...chat.messages, data.data],
+        //         }
+        //       : chat
+        //   )
+        // )
+
         setChats(prevChats =>
-          prevChats.map(chat =>
-            chat._id === selectedChat?._id
-              ? {
-                  ...chat,
-                  messages: [...chat.messages, data.data],
-                }
-              : chat
-          )
+          prevChats.map(chat => {
+            if (chat._id === selectedChat?._id) {
+              // 1. 更新消息列表（添加AI回复）
+              const updatedMessages = [...chat.messages, data.data]
+
+              // 2. 查找第一条AI回复
+              const firstAssistantMessage =
+                updatedMessages.find(item => item.role === 'assistant')
+                  ?.content || ''
+
+              // 3. 仅当当前名称是默认值（如"新聊天"）时，才用AI回复更新名称
+              const shouldUpdateName =
+                chat.name === '新聊天' ||
+                chat.name === '未命名聊天' ||
+                !chat.name // 根据你的默认名称判断
+
+              const newName = shouldUpdateName
+                ? firstAssistantMessage.substring(0, 8) || '新聊天'
+                : chat.name // 保持原有名称
+
+              // 3. 返回更新后的聊天对象
+              return {
+                ...chat,
+                name: newName, // 仅在必要时更新名称
+                messages: updatedMessages,
+              }
+            }
+            return chat
+          })
         )
 
         // 2. 准备AI回复的"打字机效果"（逐字显示）
