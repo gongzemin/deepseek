@@ -19,7 +19,6 @@ const openai = new OpenAI({
 export async function POST(req: NextRequest) {
   try {
     const { userId } = getAuth(req) // 从请求中获取用户ID
-    console.log('0000000userId', userId, getAuth(req))
     // 从请求体中提取chatId和prompt
     const { chatId, prompt } = await req.json()
 

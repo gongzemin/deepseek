@@ -51,7 +51,6 @@ interface AppContextProviderProps {
 
 export const AppContextProvider = ({ children }: AppContextProviderProps) => {
   const { user } = useUser()
-  console.log('user0000000000888888', user)
   const { getToken } = useAuth()
 
   const [chats, setChats] = useState<ChatType[]>([])
