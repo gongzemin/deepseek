@@ -1,23 +1,20 @@
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 import { assets } from '@/assets/assets'
 import Image from 'next/image'
 import { useAppContext } from '@/context/AppContext'
 import axios from 'axios'
+import { OpenMenuState } from '@/types'
 import { toast } from 'react-hot-toast'
 
 // 使用接口定义props
 
-// 定义 openMenu 的状态类型
-type OpenMenuState = {
-  id: number
-  open: boolean
-}
+// 允许 id 为 string 或 null（null 表示无菜单打开）
 
 // 定义组件 Props 类型
 interface ChatLabelProps {
   openMenu: OpenMenuState
-  setOpenMenu?: (newState: OpenMenuState) => void // 接收完整状态对象
-  id: number // 聊天ID
+  setOpenMenu?: Dispatch<SetStateAction<OpenMenuState>> // 接收完整状态对象
+  id: string // 聊天ID
   name: string // 聊天名称
   isSelected?: boolean // 是否为当前选中的聊天
 }
@@ -47,7 +44,7 @@ const ChatLabel: React.FC<ChatLabelProps> = ({
       })
       if (data.success) {
         fetchUsersChats()
-        setOpenMenu?.({ id: 0, open: false })
+        setOpenMenu?.({ id: null, open: false })
         toast.success(data.message)
       } else {
         toast.error(data.message)
@@ -67,7 +64,7 @@ const ChatLabel: React.FC<ChatLabelProps> = ({
       })
       if (data.success) {
         fetchUsersChats()
-        setOpenMenu?.({ id: 0, open: false })
+        setOpenMenu?.({ id: null, open: false })
         toast.success(data.message)
       } else {
         toast.error(data.message)
@@ -78,7 +75,7 @@ const ChatLabel: React.FC<ChatLabelProps> = ({
     }
   }
 
-  const wrapperClick = (e: React.MouseEvent, id: number) => {
+  const wrapperClick = (e: React.MouseEvent, id: string) => {
     e.stopPropagation() // 阻止事件冒泡，避免触发 selectChat
     setOpenMenu?.({ id, open: !openMenu.open }) // 切换菜单状态
   }

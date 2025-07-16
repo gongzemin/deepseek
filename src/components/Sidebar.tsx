@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useClerk, UserButton } from '@clerk/nextjs'
 import { useAppContext } from '@/context/AppContext'
 import ChatLabel from './ChatLabel'
+import { OpenMenuState } from '@/types'
 
 interface SidebarProps {
   expand: boolean
@@ -13,7 +14,10 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
   const { openSignIn } = useClerk()
   const { user, chats, createNewChat, fetchUsersChats, selectedChat } =
     useAppContext()
-  const [openMenu, setOpenMenu] = useState({ id: 0, open: false })
+  const [openMenu, setOpenMenu] = useState<OpenMenuState>({
+    id: null,
+    open: false,
+  })
 
   // 创建新聊天后 聊天记录也要是新聊天的 就是说新聊天聊天记录为空
   const createNew = async () => {

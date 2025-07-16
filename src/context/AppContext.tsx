@@ -15,10 +15,10 @@ type UserType = ReturnType<typeof useUser>['user']
 
 import { MessageType } from '@/types'
 
+// 聊天记录类型
 interface ChatType {
-  id?: string
-  updatedAt: string
-  _id: number
+  _id: string // 对应 MongoDB 的 ObjectId（字符串类型）
+  updatedAt: string // ISO 日期字符串（推荐）或 Date 类型
   messages: MessageType[]
   name?: string
 }
