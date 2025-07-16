@@ -9,7 +9,6 @@ import Image from 'next/image'
 import { assets } from '@/assets/assets'
 import { useAppContext } from '@/context/AppContext'
 import toast from 'react-hot-toast'
-import axios from 'axios'
 
 import { MessageType } from '@/types'
 
