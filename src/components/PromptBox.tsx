@@ -19,7 +19,6 @@ interface PromptBoxProps {
   isLoading: boolean
 }
 const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
-  console.log('PromptBox rendered', isLoading, setIsLoading)
   const [prompt, setPrompt] = useState<string>('')
   /*
   user: The authenticated user (type not specified in the code).
@@ -121,8 +120,21 @@ const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
                 !chat.name // 根据你的默认名称判断
 
               const newName = shouldUpdateName
-                ? firstAssistantMessage.substring(0, 8) || '新聊天'
+                ? firstAssistantMessage.substring(0, 12)
                 : chat.name // 保持原有名称
+
+              // 如果是自动命名（非用户手动修改），调用接口入库
+              if (shouldUpdateName) {
+                // 直接调用接口（避免弹出prompt）
+                axios
+                  .post('/api/chat/rename', {
+                    chatId: chat._id,
+                    name: newName,
+                  })
+                  .catch(err => {
+                    console.error('自动命名入库失败', err)
+                  })
+              }
 
               // 3. 返回更新后的聊天对象
               return {
