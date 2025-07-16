@@ -11,7 +11,8 @@ interface SidebarProps {
 }
 const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
   const { openSignIn } = useClerk()
-  const { user, chats, createNewChat, fetchUsersChats } = useAppContext()
+  const { user, chats, createNewChat, fetchUsersChats, selectedChat } =
+    useAppContext()
   const [openMenu, setOpenMenu] = useState({ id: 0, open: false })
 
   // 创建新聊天后 聊天记录也要是新聊天的 就是说新聊天聊天记录为空
@@ -109,6 +110,7 @@ const Sidebar: React.FC<SidebarProps> = ({ expand, setExpand }) => {
               id={chat._id}
               openMenu={openMenu}
               setOpenMenu={setOpenMenu}
+              isSelected={selectedChat?._id === chat._id}
             />
           ))}
         </div>

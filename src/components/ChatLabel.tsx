@@ -19,6 +19,7 @@ interface ChatLabelProps {
   setOpenMenu?: (newState: OpenMenuState) => void // 接收完整状态对象
   id: number // 聊天ID
   name: string // 聊天名称
+  isSelected?: boolean // 是否为当前选中的聊天
 }
 
 const ChatLabel: React.FC<ChatLabelProps> = ({
@@ -26,6 +27,7 @@ const ChatLabel: React.FC<ChatLabelProps> = ({
   setOpenMenu,
   id, // 聊天ID（从父组件传入）
   name, // 聊天名称（从父组件传入）
+  isSelected = false, // 是否为当前选中的聊天（默认为false）
 }) => {
   // 从全局状态获取方法和数据
   const { fetchUsersChats, chats, setSelectedChat } = useAppContext()
@@ -84,8 +86,10 @@ const ChatLabel: React.FC<ChatLabelProps> = ({
   return (
     <div
       onClick={selectChat}
-      className="flex items-center justify-between p-2 text-white/80
-        hover:bg-white/10 rounded-lg text-sm group cursor-pointer"
+      className={`flex items-center justify-between p-2 text-white/80
+        hover:bg-white/10 
+        ${isSelected ? 'bg-white/10' : ''} // 选中时应用与 hover 相同的背景
+        rounded-lg text-sm group cursor-pointer`}
     >
       <p className="group-hover:max-w-5/6 truncate">{name}</p>
       <div
