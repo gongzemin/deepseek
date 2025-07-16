@@ -12,7 +12,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: '1DeepSeek - 探索未至之境',
+  title: 'DeepSeek - 探索未至之境',
   description:
     'DeepSeek 是一个探索未知领域的工具，旨在帮助用户发现和理解新知识。',
 }
