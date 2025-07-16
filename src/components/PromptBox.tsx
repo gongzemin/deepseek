@@ -43,8 +43,8 @@ const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
   ) => {
     const promptCopy = prompt // 缓存当前输入的prompt，用于后续错误恢复
     try {
-      // 前置校验：阻止默认事件、检查登录状态、检查是否正在加载、检查输入是否为空，若不满足条件则提示错误并终止函数。
-      e.preventDefault() // 阻止事件默认行为（如表单提交导致的页面刷新）
+      // 前置校验：阻止默认事件、检查登录状态、检查是否正在加载、检查输入是否为空
+      e.preventDefault() // 阻止事件默认行为
       if (!user) return toast.error('登录开启对话')
       if (isLoading) return toast.error('等待响应')
 
@@ -53,7 +53,7 @@ const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
         return
       }
 
-      setIsLoading(true) // 设置加载状态为 true，表示正在处理请求
+      setIsLoading(true) // 设置加载状态为 true
       setPrompt('') // 清空输入框内容
 
       const userPrompt: MessageType = {
@@ -61,140 +61,161 @@ const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
         content: prompt,
         timestamp: Date.now(),
       }
-      // 同时更新全局聊天列表（chats）和当前选中的聊天（selectedChat），确保本地状态与用户操作同步，先显示用户发送的消息
 
-      // 更新全局聊天列表中当前选中的聊天记录
+      // 更新全局聊天列表
       setChats(prevChats =>
-        prevChats.map(
-          chat =>
-            chat._id === selectedChat?._id // 找到当前选中的聊天（通过_id匹配）
-              ? {
-                  ...chat,
-                  messages: [...chat.messages, userPrompt], // 添加用户消息到该聊天的消息列表
-                }
-              : chat // 其他聊天不修改
+        prevChats.map(chat =>
+          chat._id === selectedChat?._id
+            ? {
+                ...chat,
+                messages: [...chat.messages, userPrompt],
+              }
+            : chat
         )
       )
 
-      // 单独更新当前选中的聊天记录（优化局部状态）
+      // 更新当前选中的聊天记录
       setSelectedChat(prevChat => {
-        if (!prevChat) return null // 确保prevChat存在
+        if (!prevChat) return null
         return {
           ...prevChat,
           messages: [...prevChat.messages, userPrompt],
         }
       })
 
-      const { data } = await axios.post('/api/chat/ai', {
-        chatId: selectedChat?._id, // 当前聊天的唯一标识
-        prompt, // 用户输入的消息内容
+      // 使用fetch处理SSE请求
+      const response = await fetch('/api/chat/ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chatId: selectedChat?._id,
+          prompt,
+        }),
       })
-      if (data.success) {
-        // 1. 先将AI回复完整添加到全局聊天列表
-        // setChats(prevChats =>
-        //   prevChats.map(chat =>
-        //     chat._id === selectedChat?._id
-        //       ? {
-        //           ...chat,
-        //           messages: [...chat.messages, data.data],
-        //         }
-        //       : chat
-        //   )
-        // )
 
-        setChats(prevChats =>
-          prevChats.map(chat => {
-            if (chat._id === selectedChat?._id) {
-              // 1. 更新消息列表（添加AI回复）
-              const updatedMessages = [...chat.messages, data.data]
+      if (!response.ok) {
+        throw new Error('网络请求失败')
+      }
 
-              // 2. 查找第一条AI回复
-              const firstAssistantMessage =
-                updatedMessages.find(item => item.role === 'assistant')
-                  ?.content || ''
+      const reader = response.body?.getReader()
+      if (!reader) {
+        throw new Error('无法读取响应流')
+      }
 
-              // 3. 仅当当前名称是默认值（如"新聊天"）时，才用AI回复更新名称
-              const shouldUpdateName =
-                chat.name === '新聊天' ||
-                chat.name === '未命名聊天' ||
-                !chat.name // 根据你的默认名称判断
+      let fullContent = ''
+      let isFirstContent = true // 标记是否是第一次收到内容
+      const assistantMessage: MessageType = {
+        role: 'assistant',
+        content: '',
+        timestamp: Date.now(),
+      }
 
-              const newName = shouldUpdateName
-                ? firstAssistantMessage.substring(0, 12)
-                : chat.name // 保持原有名称
-
-              // 如果是自动命名（非用户手动修改），调用接口入库
-              if (shouldUpdateName) {
-                // 直接调用接口（避免弹出prompt）
-                axios
-                  .post('/api/chat/rename', {
-                    chatId: chat._id,
-                    name: newName,
-                  })
-                  .catch(err => {
-                    console.error('自动命名入库失败', err)
-                  })
-              }
-
-              // 3. 返回更新后的聊天对象
-              return {
-                ...chat,
-                name: newName, // 仅在必要时更新名称
-                messages: updatedMessages,
-              }
-            }
-            return chat
-          })
-        )
-
-        // 2. 准备AI回复的"打字机效果"（逐字显示）
-        const message = data.data.content // AI回复的完整内容
-        const messageTokens = message.split(' ') // 将内容按空格分割为单词数组
-        const assistantMessage: MessageType = {
-          role: 'assistant',
-          content: '',
-          timestamp: Date.now(),
+      // 添加空的助手消息
+      setSelectedChat(prevChat => {
+        if (!prevChat) return null
+        return {
+          ...prevChat,
+          messages: [...prevChat.messages, assistantMessage],
         }
-        // 先添加一个空内容的助手消息到当前选中的聊天
+      })
 
-        setSelectedChat(prevChat => {
-          if (!prevChat) return null // 确保prevChat存在
-          return {
-            ...prevChat,
-            messages: [...prevChat.messages, assistantMessage],
+      // 处理SSE流
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const text = new TextDecoder().decode(value)
+        const lines = text
+          .split('\n\n')
+          .filter(line => line.startsWith('data: '))
+
+        for (const line of lines) {
+          const jsonData = JSON.parse(line.replace('data: ', ''))
+
+          if (jsonData.success === false) {
+            toast.error(jsonData.error)
+            setPrompt(promptCopy)
+            setIsLoading(false) // 错误时停止加载
+            return
           }
-        })
-        // 3. 逐词显示AI回复（打字机效果）
-        for (let i = 0; i < messageTokens.length; i++) {
-          setTimeout(() => {
-            // 拼接前i+1个单词作为当前显示的内容
-            assistantMessage.content = messageTokens.slice(0, i + 1).join(' ')
-            // 更新当前选中聊天的消息列表：替换最后一条（空消息）为当前拼接的内容
+
+          if (jsonData.content) {
+            if (isFirstContent) {
+              setIsLoading(false) // 第一次收到内容时停止加载
+              isFirstContent = false
+            }
+            fullContent += jsonData.content
+            // 实时更新助手消息内容
             setSelectedChat(prev => {
-              if (!prev) return null // 确保prev存在
+              if (!prev) return null
               const updatedMessages = [
                 ...prev.messages.slice(0, -1),
-                assistantMessage,
+                { ...assistantMessage, content: fullContent },
               ]
               return {
                 ...prev,
                 messages: updatedMessages,
               }
             })
-          }, i * 100)
+          }
+
+          // 处理最终消息
+          if (jsonData.success && jsonData.data) {
+            // 更新全局聊天列表
+            setChats(prevChats =>
+              prevChats.map(chat => {
+                if (chat._id === selectedChat?._id) {
+                  const updatedMessages = [...chat.messages, jsonData.data]
+                  const firstAssistantMessage =
+                    updatedMessages.find(item => item.role === 'assistant')
+                      ?.content || ''
+
+                  const shouldUpdateName =
+                    chat.name === '新聊天' ||
+                    chat.name === '未命名聊天' ||
+                    !chat.name
+
+                  const newName = shouldUpdateName
+                    ? firstAssistantMessage.substring(0, 12)
+                    : chat.name
+
+                  if (shouldUpdateName) {
+                    fetch('/api/chat/rename', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        chatId: chat._id,
+                        name: newName,
+                      }),
+                    }).catch(err => {
+                      console.error('自动命名入库失败', err)
+                    })
+                  }
+
+                  return {
+                    ...chat,
+                    name: newName,
+                    messages: updatedMessages,
+                  }
+                }
+                return chat
+              })
+            )
+          }
         }
-      } else {
-        toast.error(data.message)
-        setPrompt(promptCopy) // Reset prompt if error
       }
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : '发送消息失败，请重试'
       )
+      setPrompt(promptCopy) // 恢复输入内容
     } finally {
       setIsLoading(false)
     }
-    setPrompt('')
   }
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
