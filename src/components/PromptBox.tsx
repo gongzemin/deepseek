@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  KeyboardEvent,
-  FormEvent,
-} from 'react'
+import React, { useState, useRef, KeyboardEvent, FormEvent } from 'react'
 import Image from 'next/image'
 import { assets } from '@/assets/assets'
 import { useAppContext } from '@/context/AppContext'
@@ -19,13 +13,7 @@ interface PromptBoxProps {
 }
 const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
   const [prompt, setPrompt] = useState<string>('')
-  /*
-  user: The authenticated user (type not specified in the code).
-  chats: An array of chat objects.
-  setChats: Updates the chats array.
-  selectedChat: The currently selected chat.
-  setSelectedChat: Updates the selected chat.
-  */
+
   const { user, setChats, selectedChat, setSelectedChat } = useAppContext() // 全局状态
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -62,8 +50,8 @@ const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
       }
 
       // 更新全局聊天列表
-      setChats(prevChats =>
-        prevChats.map(chat =>
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
           chat._id === selectedChat?._id
             ? {
                 ...chat,
@@ -74,7 +62,7 @@ const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
       )
 
       // 更新当前选中的聊天记录
-      setSelectedChat(prevChat => {
+      setSelectedChat((prevChat) => {
         if (!prevChat) return null
         return {
           ...prevChat,
@@ -112,7 +100,7 @@ const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
       }
 
       // 添加空的助手消息
-      setSelectedChat(prevChat => {
+      setSelectedChat((prevChat) => {
         if (!prevChat) return null
         return {
           ...prevChat,
@@ -128,7 +116,7 @@ const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
         const text = new TextDecoder().decode(value)
         const lines = text
           .split('\n\n')
-          .filter(line => line.startsWith('data: '))
+          .filter((line) => line.startsWith('data: '))
 
         for (const line of lines) {
           const jsonData = JSON.parse(line.replace('data: ', ''))
@@ -147,7 +135,7 @@ const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
             }
             fullContent += jsonData.content
             // 实时更新助手消息内容
-            setSelectedChat(prev => {
+            setSelectedChat((prev) => {
               if (!prev) return null
               const updatedMessages = [
                 ...prev.messages.slice(0, -1),
@@ -163,12 +151,12 @@ const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
           // 处理最终消息
           if (jsonData.success && jsonData.data) {
             // 更新全局聊天列表
-            setChats(prevChats =>
-              prevChats.map(chat => {
+            setChats((prevChats) =>
+              prevChats.map((chat) => {
                 if (chat._id === selectedChat?._id) {
                   const updatedMessages = [...chat.messages, jsonData.data]
                   const firstAssistantMessage =
-                    updatedMessages.find(item => item.role === 'assistant')
+                    updatedMessages.find((item) => item.role === 'assistant')
                       ?.content || ''
 
                   const shouldUpdateName =
@@ -190,7 +178,7 @@ const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
                         chatId: chat._id,
                         name: newName,
                       }),
-                    }).catch(err => {
+                    }).catch((err) => {
                       console.error('自动命名入库失败', err)
                     })
                   }
@@ -217,15 +205,6 @@ const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
     }
   }
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-
-  useEffect(() => {
-    const textarea = textareaRef.current
-    if (textarea) {
-      // Without resetting to 'auto', the height won’t shrink when content is deleted.
-      textarea.style.height = 'auto' // Reset height
-      textarea.style.height = `${textarea.scrollHeight}px` // Set to scrollHeight
-    }
-  }, [prompt])
   return (
     <form
       onSubmit={sendPrompt}
@@ -240,7 +219,7 @@ const PromptBox: React.FC<PromptBoxProps> = ({ setIsLoading, isLoading }) => {
         rows={2}
         placeholder="给 DeepSeek 发送消息"
         required
-        onChange={e => setPrompt(e.target.value)}
+        onChange={(e) => setPrompt(e.target.value)}
         value={prompt}
       />
 
