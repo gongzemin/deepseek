@@ -4,7 +4,6 @@ import User from '@/models/User'
 import { headers } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
-// Define SvixEvent type
 interface SvixEvent {
   data: {
     id: string
@@ -21,7 +20,7 @@ export async function POST(req: NextRequest) {
   const signingSecret = process.env.SIGNING_SECRET
   if (!signingSecret) {
     return NextResponse.json(
-      { error: 'Missing SIGNING_SECRET environment variable' },
+      { error: '没有找到 SIGNING_SECRET 环境变量' },
       { status: 500 }
     )
   }
@@ -29,14 +28,14 @@ export async function POST(req: NextRequest) {
   const wh = new Webhook(signingSecret)
   const headerPayload = await headers()
 
-  // Ensure the headers are not null before proceeding
+  // 获取必要的 Svix 头部信息
   const svixId = headerPayload.get('svix-id')
   const svixTimestamp = headerPayload.get('svix-timestamp')
   const svixSignature = headerPayload.get('svix-signature')
 
   if (!svixId || !svixTimestamp || !svixSignature) {
     return NextResponse.json(
-      { error: 'Missing required Svix headers' },
+      { error: '没有找到必要的 Svix 头部信息' },
       { status: 400 }
     )
   }
@@ -47,14 +46,14 @@ export async function POST(req: NextRequest) {
     'svix-signature': svixSignature,
   }
 
-  // Get the payload and verify it
+  // 获取请求体并转换为字符串
   const payload = await req.json()
   const body = JSON.stringify(payload)
 
-  // Type the result of verify() to SvixEvent
+  // 验证请求的有效性
   const { data, type } = wh.verify(body, svixHeaders) as SvixEvent
 
-  // Prepare the user data to be saved in the database
+  // 准备用户数据
   const userData = {
     _id: data.id,
     email: data.email_addresses[0].email_address,
@@ -64,7 +63,7 @@ export async function POST(req: NextRequest) {
 
   await connectDB()
 
-  // Handle the event types
+  // 处理不同类型的事件
   switch (type) {
     case 'user.created':
       await User.create(userData)

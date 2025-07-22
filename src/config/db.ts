@@ -1,3 +1,8 @@
+/**
+ * 确保整个应用生命周期中只创建一个 MongoDB 连接实例，避免重复连接导致的性能问题。
+ * 在开发环境中，Next.js 的热重载会重新执行代码，导致多次调用 mongoose.connect()，创建大量连接。
+ * 因此，使用全局变量缓存连接实例。
+ */
 import mongoose, { Connection } from 'mongoose'
 interface Cache {
   conn: Connection | null

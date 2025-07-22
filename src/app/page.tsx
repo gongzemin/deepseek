@@ -26,6 +26,7 @@ export default function Home() {
     }
   }, [selectedChat])
 
+  // 切换对话的时候 可以到每段对话的结束
   useEffect(() => {
     if (containerRef.current) {
       containerRef.current?.scrollTo({

@@ -12,13 +12,11 @@ export async function POST(req: NextRequest) {
         message: '用户未授权',
       })
     }
-    // Prepare the chat data to be saved in the database
     const chatData = {
       userId,
       messages: [],
       name: '新聊天', // Default chat name
     }
-    // Connect to the database and create a new chat
     await connectDB()
     await Chat.create(chatData)
     return NextResponse.json({
