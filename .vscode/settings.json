@@ -1,3 +1,6 @@
 {
-  "liveServer.settings.port": 5501
+  "liveServer.settings.port": 5501,
+  // Prettier配置
+  "prettier.singleQuote": true, // 使用单引号
+  "prettier.semi": false // 不使用分号
 }
